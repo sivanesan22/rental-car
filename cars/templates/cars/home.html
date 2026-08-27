@@ -1,0 +1,152 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}Antigravity Rentals | Find Your Dream Car{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-tagline">Exquisite Driving Experiences</span>
+        <h1 class="hero-title">Elevate Your Journey With <span>SSPremium</span></h1>
+        <p class="hero-subtitle">Discover a premium collection of luxury, electric, and high-performance sports cars tailored for your next destination.</p>
+    </div>
+
+    <!-- Search/Filter Widget -->
+    <div class="search-widget">
+        <form action="{% url 'car_list' %}" method="GET" class="search-form">
+            <div class="form-group">
+                <label class="form-label" for="search-input">Search Car</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="q" id="search-input" class="form-input" placeholder="Brand or model...">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="category-select">Category</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-car-side"></i>
+                    <select name="category" id="category-select" class="form-input">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="transmission-select">Transmission</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-gears"></i>
+                    <select name="transmission" id="transmission-select" class="form-input">
+                        <option value="">Any</option>
+                        <option value="Automatic">Automatic</option>
+                        <option value="Manual">Manual</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="search-submit-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Find Cars
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Category Explorer Section -->
+<section class="section-container">
+    <div class="section-header">
+        <h2 class="section-title">Explore by Category</h2>
+        <p class="section-subtitle">Find the perfect match for your driving style and requirements</p>
+    </div>
+    
+    <div class="category-grid">
+        {% for cat in categories %}
+        <a href="{% url 'car_list' %}?category={{ cat.slug }}" class="category-card">
+            {% if cat.image %}
+                <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="category-bg-image">
+            {% else %}
+                <div class="category-bg-image" style="background-color: var(--bg-tertiary);"></div>
+            {% endif %}
+            <div class="category-info">
+                <h3 class="category-name">{{ cat.name }}</h3>
+                <p class="category-desc">{{ cat.description }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Car Fleet Section -->
+<section class="section-container" style="background-color: rgba(17, 24, 39, 0.3); border-radius: 40px; margin-bottom: 5rem; border: 1px solid var(--glass-border);">
+    <div class="section-header">
+        <h2 class="section-title">Featured Fleet</h2>
+        <p class="section-subtitle">Experience our hand-picked selection of premium exotic rides</p>
+    </div>
+    
+    <div class="car-grid">
+        {% for car in featured_cars %}
+        <div class="car-card">
+            <div class="car-card-header">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-image">
+                {% else %}
+                    <div class="car-card-image" style="background-color: var(--bg-tertiary); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-car-rear" style="font-size: 4rem; color: var(--text-secondary);"></i></div>
+                {% endif %}
+                <div class="car-badge {% if car.is_available %}car-badge-available{% else %}car-badge-booked{% endif %}">
+                    {% if car.is_available %}Available{% else %}Reserved{% endif %}
+                </div>
+            </div>
+            
+            <div class="car-card-body">
+                <div class="car-info-title">
+                    <h3 class="car-title-text">{{ car.make }} {{ car.model }}</h3>
+                    <div class="car-price-tag">${{ car.daily_rate|floatformat:0 }}<span>/day</span></div>
+                </div>
+                <p class="car-meta-info">{{ car.category.name }} &bull; {{ car.year }} Model</p>
+                
+                <div class="car-specs-grid">
+                    <div class="spec-item">
+                        <i class="fa-solid fa-gears"></i>
+                        <span>{{ car.transmission }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fa-solid fa-gas-pump"></i>
+                        <span>{{ car.fuel_type }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>{{ car.seats }} Seats</span>
+                    </div>
+                </div>
+                
+                <div class="car-card-actions">
+                    <a href="{% url 'car_detail' car.id %}" class="btn btn-primary">Book Ride <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No featured cars available at the moment.</p>
+        {% endfor %}
+    </div>
+    
+    <div style="text-align: center; margin-top: 3rem; margin-bottom: 2rem;">
+        <a href="{% url 'car_list' %}" class="btn btn-secondary" style="width: auto;">View Entire Fleet <i class="fa-solid fa-chevron-right"></i></a>
+    </div>
+</section>
+
+<!-- Call-to-action Section -->
+<section class="section-container" style="text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%); border-radius: 30px; border: 1px solid rgba(6, 182, 212, 0.2);">
+    <h2 style="font-size: 2.25rem; margin-bottom: 1rem;">Ready to take the wheel?</h2>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem auto; font-size: 1.1rem;">Sign up today to create bookings, review luxury models, and manage your trips on our modern dashboard.</p>
+    {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-primary" style="width: auto; padding: 1rem 2.5rem;">Join Antigravity <i class="fa-solid fa-user-plus"></i></a>
+    {% else %}
+        <a href="{% url 'car_list' %}" class="btn btn-primary" style="width: auto; padding: 1rem 2.5rem;">Rent a Car Now <i class="fa-solid fa-car"></i></a>
+    {% endif %}
+</section>
+{% endblock %}

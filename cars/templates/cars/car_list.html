@@ -1,0 +1,129 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}Our Fleet | Antigravity Rentals{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header" style="text-align: left;">
+        <h1 class="section-title">Explore Our Fleet</h1>
+        {% if query %}
+            <p class="section-subtitle">Search results for "{{ query }}" ({{ cars|length }} cars found)</p>
+        {% else %}
+            <p class="section-subtitle">Browse all premium rides and customize filters to find your exact match</p>
+        {% endif %}
+    </div>
+
+    <div class="listings-layout">
+        <!-- Filter Sidebar -->
+        <aside class="filter-sidebar">
+            <h2 class="sidebar-title"><i class="fa-solid fa-sliders"></i> Filter Fleet</h2>
+            
+            <form action="{% url 'car_list' %}" method="GET" id="filter-form">
+                <!-- Keep search query if present -->
+                {% if query %}
+                    <input type="hidden" name="q" value="{{ query }}">
+                {% endif %}
+
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-category">Category</label>
+                    <select name="category" id="filter-category" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-transmission">Transmission</label>
+                    <select name="transmission" id="filter-transmission" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Any</option>
+                        <option value="Automatic" {% if selected_transmission == 'Automatic' %}selected{% endif %}>Automatic</option>
+                        <option value="Manual" {% if selected_transmission == 'Manual' %}selected{% endif %}>Manual</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-fuel">Fuel Type</label>
+                    <select name="fuel" id="filter-fuel" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Any</option>
+                        <option value="Electric" {% if selected_fuel == 'Electric' %}selected{% endif %}>Electric</option>
+                        <option value="Hybrid" {% if selected_fuel == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                        <option value="Petrol" {% if selected_fuel == 'Petrol' %}selected{% endif %}>Petrol</option>
+                        <option value="Diesel" {% if selected_fuel == 'Diesel' %}selected{% endif %}>Diesel</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Max Daily Price</label>
+                    <input type="range" name="price_max" min="50" max="500" step="10" 
+                           value="{% if selected_price %}{{ selected_price }}{% else %}500{% endif %}" 
+                           class="filter-range" oninput="priceOutput.value = this.value" onchange="this.form.submit()">
+                    <div class="price-range-label">
+                        <span>$50</span>
+                        <span>Max: <strong>$<output id="priceOutput">{% if selected_price %}{{ selected_price }}{% else %}500{% endif %}</output></strong></span>
+                    </div>
+                </div>
+
+                <div class="filter-buttons">
+                    <a href="{% url 'car_list' %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Filters</a>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Fleet Grid -->
+        <div class="fleet-content">
+            <div class="car-grid">
+                {% for car in cars %}
+                <div class="car-card">
+                    <div class="car-card-header">
+                        {% if car.image %}
+                            <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-image">
+                        {% else %}
+                            <div class="car-card-image" style="background-color: var(--bg-tertiary); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-car-rear" style="font-size: 4rem; color: var(--text-secondary);"></i></div>
+                        {% endif %}
+                        <div class="car-badge {% if car.is_available %}car-badge-available{% else %}car-badge-booked{% endif %}">
+                            {% if car.is_available %}Available{% else %}Reserved{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="car-card-body">
+                        <div class="car-info-title">
+                            <h3 class="car-title-text">{{ car.make }} {{ car.model }}</h3>
+                            <div class="car-price-tag">${{ car.daily_rate|floatformat:0 }}<span>/day</span></div>
+                        </div>
+                        <p class="car-meta-info">{{ car.category.name }} &bull; {{ car.year }} Model</p>
+                        
+                        <div class="car-specs-grid">
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gears"></i>
+                                <span>{{ car.transmission }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gas-pump"></i>
+                                <span>{{ car.fuel_type }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-user-group"></i>
+                                <span>{{ car.seats }} Seats</span>
+                            </div>
+                        </div>
+                        
+                        <div class="car-card-actions">
+                            <a href="{% url 'car_detail' car.id %}" class="btn btn-primary">Book Ride <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background-color: var(--bg-secondary); border-radius: 20px; border: 1px solid var(--glass-border);">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                    <h3>No Cars Found</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">We couldn't find any cars matching your criteria. Try resetting filters or updating your search query.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

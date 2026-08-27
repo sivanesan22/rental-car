@@ -1,0 +1,224 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}{{ car.make }} {{ car.model }} | Antigravity Rentals{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <!-- Breadcrumb or back button -->
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'car_list' %}" style="color: var(--accent-cyan); font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Back to Fleet</a>
+    </div>
+
+    <div class="detail-grid">
+        <!-- Left Column: Image, Specifications, and Reviews -->
+        <div class="detail-main-content">
+            <div class="detail-gallery">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="gallery-main-image">
+                {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: var(--bg-tertiary);"><i class="fa-solid fa-car-rear" style="font-size: 8rem; color: var(--text-secondary);"></i></div>
+                {% endif %}
+            </div>
+
+            <!-- Car Details & Specifications -->
+            <div class="detail-specs-table">
+                <h2 class="detail-section-title">Technical Specifications</h2>
+                <div class="specs-grid-extended">
+                    <div class="spec-box">
+                        <i class="fa-solid fa-car-side"></i>
+                        <div>
+                            <div class="spec-box-label">Category</div>
+                            <div class="spec-box-value">{{ car.category.name }}</div>
+                        </div>
+                    </div>
+                    <div class="spec-box">
+                        <i class="fa-solid fa-gears"></i>
+                        <div>
+                            <div class="spec-box-label">Transmission</div>
+                            <div class="spec-box-value">{{ car.transmission }}</div>
+                        </div>
+                    </div>
+                    <div class="spec-box">
+                        <i class="fa-solid fa-gas-pump"></i>
+                        <div>
+                            <div class="spec-box-label">Fuel Type</div>
+                            <div class="spec-box-value">{{ car.fuel_type }}</div>
+                        </div>
+                    </div>
+                    <div class="spec-box">
+                        <i class="fa-solid fa-user-group"></i>
+                        <div>
+                            <div class="spec-box-label">Seats</div>
+                            <div class="spec-box-value">{{ car.seats }} Adults</div>
+                        </div>
+                    </div>
+                    <div class="spec-box">
+                        <i class="fa-solid fa-suitcase"></i>
+                        <div>
+                            <div class="spec-box-label">Luggage Space</div>
+                            <div class="spec-box-value">{{ car.luggage }} Large Bags</div>
+                        </div>
+                    </div>
+                    <div class="spec-box">
+                        <i class="fa-solid fa-snowflake"></i>
+                        <div>
+                            <div class="spec-box-label">Air Conditioning</div>
+                            <div class="spec-box-value">{% if car.ac %}Yes{% else %}No{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <h2 class="detail-section-title">Customer Reviews ({{ reviews|length }})</h2>
+                
+                <div class="reviews-list">
+                    {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-author">{{ review.user.username }}</span>
+                            <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="review-stars" style="margin-bottom: 0.5rem;">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="review-comment">{{ review.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <p style="color: var(--text-secondary); italicized: true;">No reviews yet. Be the first to review this car!</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Add Review Form -->
+                {% if user.is_authenticated %}
+                <div class="add-review-form">
+                    <h3 style="margin-bottom: 1rem;">Leave a Review</h3>
+                    <form action="{% url 'post_review' car.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label" for="id_rating">Rating</label>
+                            {{ review_form.rating }}
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label" for="id_comment">Comments</label>
+                            {{ review_form.comment }}
+                        </div>
+                        <button type="submit" class="btn btn-secondary" style="width: auto;">Submit Review</button>
+                    </form>
+                </div>
+                {% else %}
+                <div style="background-color: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: var(--border-radius); padding: 1.5rem; text-align: center; margin-top: 2rem;">
+                    <p style="color: var(--text-secondary);">Please <a href="{% url 'login' %}" style="color: var(--accent-cyan); font-weight: 600;">login</a> to share your review.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Booking Widget -->
+        <div class="booking-widget-container">
+            <div class="booking-widget">
+                <div class="booking-widget-header">
+                    <div class="booking-price">
+                        <!-- We embed the data-rate directly onto this hidden element for JavaScript calculations -->
+                        <span id="car-daily-rate" data-rate="{{ car.daily_rate }}">${{ car.daily_rate|floatformat:2 }}</span><span>/day</span>
+                    </div>
+                    {% if car.average_rating > 0 %}
+                    <div class="booking-rating">
+                        <i class="fa-solid fa-star star-filled"></i> 
+                        <strong>{{ car.average_rating }}</strong> 
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;">({{ car.review_count }})</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if car.is_available %}
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'booking_create' car.id %}" method="POST" class="booking-widget-body">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="booking-start-date">Pick-up Date</label>
+                            <div class="form-input-container">
+                                <i class="fa-regular fa-calendar-days"></i>
+                                {{ booking_form.start_date }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="booking-end-date">Drop-off Date</label>
+                            <div class="form-input-container">
+                                <i class="fa-regular fa-calendar-days"></i>
+                                {{ booking_form.end_date }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="id_pickup_location">Pick-up Location</label>
+                            <div class="form-input-container">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ booking_form.pickup_location }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="id_dropoff_location">Drop-off Location</label>
+                            <div class="form-input-container">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ booking_form.dropoff_location }}
+                            </div>
+                        </div>
+
+                        <!-- Price summary container - calculated in real-time via JS -->
+                        <div class="price-summary-box" id="price-summary">
+                            <h4 style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; font-size: 0.95rem;">Price Summary</h4>
+                            <div class="summary-row">
+                                <span>Daily Rate</span>
+                                <span>${{ car.daily_rate|floatformat:2 }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Rental Duration</span>
+                                <span><span id="summary-days">1</span> days</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span id="summary-subtotal">$0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Service Fee (5%)</span>
+                                <span id="summary-fee">$0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Total Price</span>
+                                <span id="summary-total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submit-booking-btn" style="margin-top: 1rem;" disabled>Reserve Vehicle</button>
+                    </form>
+                    {% else %}
+                    <div style="text-align: center; padding: 1.5rem 0;">
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Please log in to reserve this vehicle.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Login to Book</a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div style="text-align: center; padding: 2rem 0;">
+                    <i class="fa-solid fa-calendar-xmark" style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
+                    <h3>Currently Reserved</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">This vehicle is currently rented and unavailable. Check back later or browse other listings.</p>
+                    <a href="{% url 'car_list' %}" class="btn btn-secondary" style="margin-top: 1.5rem;">Browse Available Fleet</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Antigravity Rentals - Experience premium and exotic car rentals at competitive rates. Rent electric, sports, and luxury vehicles today.">
+    <title>{% block title %}SS Premium Rentals | Premium Car Rental{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'cars/css/style.css' %}">
+</head>
+<body>
+    <!-- Premium Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="nav-logo" id="nav-logo">
+                <span class="logo-accent">SS Premium</span><span class="logo-text">RENTALS</span>
+            </a>
+            
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+            <div class="nav-links" id="nav-links">
+                <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'car_list' %}" class="nav-link {% if request.resolver_match.url_name == 'car_list' %}active{% endif %}">Browse Cars</a>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'profile_dashboard' %}active{% endif %}">My Bookings</a>
+                    {% if user.is_superuser %}
+                        <a href="/admin/" class="nav-link" target="_blank">Admin Panel</a>
+                    {% endif %}
+                    <div class="nav-user-menu">
+                        <span class="user-greeting"><i class="fa-regular fa-user"></i> {{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="nav-btn nav-btn-outline">Logout</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}">Login</a>
+                    <a href="{% url 'register' %}" class="nav-btn nav-btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Message Alerts -->
+    {% if messages %}
+    <div class="messages-container" id="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" id="alert-{{ forloop.counter }}">
+            <div class="alert-content">
+                {% if message.tags == 'success' %}
+                    <i class="fa-solid fa-circle-check"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-info"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Premium Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="{% url 'home' %}" class="footer-logo">
+                    <span class="logo-accent">SS Premium</span> RENTALS
+                </a>
+                <p class="footer-desc">Experience next-level luxury. We offer a curated collection of electric, high-performance, and executive vehicles for discerning drivers.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links-grid">
+                <div class="footer-column">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'car_list' %}">Our Fleet</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-heading">Our Fleet</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'car_list' %}?category=electric">Electric Cars</a></li>
+                        <li><a href="{% url 'car_list' %}?category=sports">Sports Cars</a></li>
+                        <li><a href="{% url 'car_list' %}?category=suvs">SUVs</a></li>
+                        <li><a href="{% url 'car_list' %}?category=luxury">Luxury Sedans</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-heading">Contact Info</h4>
+                    <ul class="footer-links-text">
+                        <li><i class="fa-solid fa-location-dot"></i> 100 Innovation Way, Tech District</li>
+                        <li><i class="fa-solid fa-phone"></i> +91 6383066336</li>
+                        <li><i class="fa-solid fa-envelope"></i> support@sspremiumrentals.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} SS Premium Car Rentals. All rights reserved. Developed in partnership with premium cars.</p>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="{% static 'cars/js/main.js' %}"></script>
+</body>
+</html>

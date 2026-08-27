@@ -1,0 +1,92 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard | Antigravity Rentals{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header" style="text-align: left; margin-bottom: 3rem;">
+        <h1 class="section-title">User Dashboard</h1>
+        <p class="section-subtitle">Manage your profile, view historical rentals, and track booking statuses</p>
+    </div>
+
+    <div class="profile-grid">
+        <!-- Left Column: User Profile Card -->
+        <aside class="profile-card">
+            <div class="avatar-icon">
+                <i class="fa-solid fa-circle-user"></i>
+            </div>
+            <h2 class="profile-name">{{ user.username }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+            
+            <div class="profile-stats">
+                <div class="stat-box">
+                    <span>Total Bookings</span>
+                    <span class="stat-val">{{ bookings|length }}</span>
+                </div>
+                <div class="stat-box">
+                    <span>Member Since</span>
+                    <span class="stat-val" style="color: var(--text-secondary); font-weight: 500;">{{ user.date_joined|date:"M Y" }}</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Column: Booking History -->
+        <div class="bookings-list-container">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1rem;"><i class="fa-solid fa-clock-history"></i> My Bookings</h2>
+            
+            {% for booking in bookings %}
+            <div class="booking-item-card">
+                {% if booking.car.image %}
+                    <img src="{{ booking.car.image.url }}" alt="{{ booking.car }}" class="booking-item-img">
+                {% else %}
+                    <div style="width: 200px; display: flex; align-items: center; justify-content: center; background-color: var(--bg-tertiary);"><i class="fa-solid fa-car-rear" style="font-size: 3rem; color: var(--text-secondary);"></i></div>
+                {% endif %}
+                
+                <div class="booking-item-details">
+                    <div class="booking-details-left">
+                        <span class="booking-id-text">Booking #{{ booking.id }} &bull; Booked on {{ booking.created_at|date:"M d, Y" }}</span>
+                        <h3 class="booking-car-name">{{ booking.car }}</h3>
+                        
+                        <p class="booking-dates-info">
+                            <i class="fa-regular fa-calendar"></i> 
+                            {{ booking.start_date|date:"M d, Y" }} to {{ booking.end_date|date:"M d, Y" }}
+                            ({{ booking.duration_days }} day{{ booking.duration_days|pluralize }})
+                        </p>
+                        <p class="booking-dates-info" style="font-size: 0.85rem;">
+                            <i class="fa-solid fa-location-dot"></i> Pick-up: {{ booking.pickup_location }}
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem;">
+                        <span class="booking-badge {% if booking.status == 'Pending' %}badge-pending{% elif booking.status == 'Confirmed' %}badge-confirmed{% elif booking.status == 'Cancelled' %}badge-cancelled{% else %}badge-completed{% endif %}">
+                            {{ booking.status }}
+                        </span>
+                        
+                        <span class="booking-price-info">${{ booking.total_price|floatformat:2 }}</span>
+                        
+                        <!-- Cancellation buttons -->
+                        {% if booking.status == 'Pending' or booking.status == 'Confirmed' %}
+                            <!-- Confirm cancellation triggers -->
+                            <form action="{% url 'cancel_booking' booking.id %}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--danger); width: auto;">
+                                    <i class="fa-solid fa-trash-can"></i> Cancel
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: 4rem 2rem; background-color: var(--bg-secondary); border-radius: 20px; border: 1px solid var(--glass-border);">
+                <i class="fa-solid fa-road" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                <h3>No Rentals Booked</h3>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem; margin-bottom: 1.5rem;">You have not made any car reservations yet.</p>
+                <a href="{% url 'car_list' %}" class="btn btn-primary" style="width: auto;">Rent a Car Now</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

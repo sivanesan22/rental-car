@@ -1,0 +1,57 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}Create Account | Antigravity Rentals{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Get Started</h1>
+            <p class="auth-subtitle">Create a free account to book vehicles, submit reviews, and track trips</p>
+        </div>
+
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-user"></i>
+                    {{ form.username }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email Address</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-envelope"></i>
+                    {{ form.email }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password">Password</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-lock"></i>
+                    {{ form.password }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password_confirm">Confirm Password</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ form.password_confirm }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-action-btn" style="margin-top: 1.5rem;">Register Account <i class="fa-solid fa-user-plus"></i></button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Log in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

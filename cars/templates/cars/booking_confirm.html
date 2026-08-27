@@ -1,0 +1,65 @@
+{% extends 'cars/base.html' %}
+{% load static %}
+
+{% block title %}Confirm Reservation | Antigravity Rentals{% endblock %}
+
+{% block content %}
+<div class="section-container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="confirm-card">
+        <div class="confirm-header">
+            <h1 class="section-title" style="font-size: 1.75rem;">Confirm Reservation</h1>
+            <p class="section-subtitle" style="margin-top: 0.25rem;">Please review your rental specifications before finalizing your booking</p>
+        </div>
+
+        <div class="confirm-details-list">
+            <div class="confirm-details-row">
+                <span class="confirm-label">Selected Vehicle</span>
+                <span class="confirm-value">{{ booking.car }}</span>
+            </div>
+            
+            <div class="confirm-details-row">
+                <span class="confirm-label">Daily Rental Rate</span>
+                <span class="confirm-value">${{ booking.car.daily_rate|floatformat:2 }} / day</span>
+            </div>
+
+            <div class="confirm-details-row">
+                <span class="confirm-label">Pick-up Location</span>
+                <span class="confirm-value">{{ booking.pickup_location }}</span>
+            </div>
+
+            <div class="confirm-details-row">
+                <span class="confirm-label">Drop-off Location</span>
+                <span class="confirm-value">{{ booking.dropoff_location }}</span>
+            </div>
+
+            <div class="confirm-details-row">
+                <span class="confirm-label">Pick-up Date</span>
+                <span class="confirm-value">{{ booking.start_date|date:"F d, Y" }}</span>
+            </div>
+
+            <div class="confirm-details-row">
+                <span class="confirm-label">Drop-off Date</span>
+                <span class="confirm-value">{{ booking.end_date|date:"F d, Y" }}</span>
+            </div>
+
+            <div class="confirm-details-row">
+                <span class="confirm-label">Duration</span>
+                <span class="confirm-value">{{ booking.duration_days }} Day{{ booking.duration_days|pluralize }}</span>
+            </div>
+
+            <div class="confirm-details-row" style="border-bottom: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                <span class="confirm-label" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Total Price (incl. fees)</span>
+                <span class="confirm-value total">${{ booking.total_price|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'booking_confirm' booking.id %}">
+            {% csrf_token %}
+            <div class="confirm-actions">
+                <a href="{% url 'car_detail' booking.car.id %}" class="btn btn-secondary">Modify Dates</a>
+                <button type="submit" class="btn btn-primary">Confirm & Book Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
