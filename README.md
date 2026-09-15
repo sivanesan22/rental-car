@@ -59,3 +59,21 @@ rental-car/
 ├── manage.py
 ├── requirements.txt
 └── .gitignore
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+
+![Home Page](screenshots/home.png)
+
+### 🚘 Car Listing
+
+![Car Listing](screenshots/cars.png)
+
+### 🚗 Car Details
+
+![Car Details](screenshots/details.png)
+
+### 🔐 Login
+
+![Login](screenshots/login.png)
