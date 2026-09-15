@@ -1,28 +1,41 @@
 # 🚗 Rental Car Management System
 
-A web-based Rental Car Management System developed using Python and Django.
+A web-based car rental management application built using
+Python and Django.
 
-## 📌 Features
+The application allows users to browse available cars,
+view car details and manage rental-related information
+through a simple and responsive interface.
 
-- User Registration and Login
-- Browse Available Cars
-- Car Categories
-- Car Booking
-- Rental Management
-- Admin Dashboard
-- Car Management
-- Customer Management
-- Booking Management
+---
 
-## 🛠️ Technologies Used
+## ✨ Features
 
-- Python
-- Django
-- HTML
-- CSS
-- JavaScript
-- Bootstrap
-- MySQL
+- 👤 User Management
+- 🚘 Car Listing
+- 🗂️ Car Category Management
+- 🔍 Car Search
+- 🖼️ Car Image Management
+- 📋 Rental Management
+- 🔐 Authentication
+- 👨‍💼 Admin Management
+- 📱 Responsive User Interface
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Usage |
+|---|---|
+| Python | Backend Programming |
+| Django | Web Framework |
+| MySQL | Database |
+| HTML5 | Structure |
+| CSS3 | Styling |
+| JavaScript | Frontend Interaction |
+| Git | Version Control |
+
+---
 
 ## 📂 Project Structure
 
@@ -30,8 +43,19 @@ A web-based Rental Car Management System developed using Python and Django.
 rental-car/
 │
 ├── cars/
-├── templates/
-├── static/
-├── media/
+│   ├── migrations/
+│   ├── templates/
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── admin.py
+│
+├── rentacar_project/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
 ├── manage.py
-└── requirements.txt
+├── requirements.txt
+└── .gitignore
